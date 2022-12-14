@@ -1,0 +1,30 @@
+@import './reset.scss';
+
+html {
+  font-size: 62.5%;
+}
+
+.galaxy__zone {
+  background: url('./assets/bg.jpg') center / cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.galaxy {
+  position: relative;
+  height: 80vh;
+  width: 80vw;
+  display: flex;
+  align-items: flex-end;
+}
+
+.galaxy__zone-ufo {
+  width: 20rem;
+  height: 15rem;
+  cursor: grab;
+  z-index: 1;
+  background: url('./assets/ufo.png') bottom / contain no-repeat;
+}
