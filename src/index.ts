@@ -5,6 +5,8 @@ const dragger = () => {
   const dragTarget = document.querySelector<HTMLElement>('.galaxy__zone-ufo--js')
   const dragWrapper = document.querySelector<HTMLElement>('.galaxy--js')
 
+  let isDragReady = false
+
   if (dragTarget && dragZoneEl && dragWrapper) {
     const setDraggable = (state: boolean) => {
       if (state) {
@@ -22,24 +24,48 @@ const dragger = () => {
     }
 
     const onMouseDown = (event: MouseEvent) => {
-      const shiftX = event.clientX - dragTarget.getBoundingClientRect().left
+      const shiftX = event.clientX - dragTarget?.getBoundingClientRect().left
       const shiftY = event.clientY - dragTarget.getBoundingClientRect().top
+      isDragReady = true
 
       const moveAt = (pageX: number, pageY: number) => {
-        const cordX = pageX - shiftX
-        const cordY = pageY - shiftY
-        const leftSideRestrict = cordX >= 0
-        const topSideRestrict = cordY >= 0
-        const rightSideRestrict = cordX + dragTarget.offsetWidth <= dragZoneEl.offsetWidth
-        const bottomSideRestrict = cordY + dragTarget.offsetHeight <= dragZoneEl.offsetHeight
+        if (!isDragReady) return
 
-        if (leftSideRestrict && rightSideRestrict && topSideRestrict && bottomSideRestrict) {
-          dragTarget.style.left = `${cordX}px`
-          dragTarget.style.top = `${cordY}px`
+        let cordX = pageX - shiftX
+        let cordY = pageY - shiftY
+        const dragZoneClientWidth = dragZoneEl.clientWidth
+        const dragTargetClientWidth = dragTarget.clientWidth
+        const dragZoneClientHeight = dragZoneEl.clientHeight
+        const dragTargetClientHeight = dragTarget.clientHeight
+        const leftSideRestrict = cordX < 0
+        const topSideRestrict = cordY < 0
+        const rightSideRestrict = cordX + dragTargetClientWidth >= dragZoneClientWidth
+        const bottomSideRestrict = cordY + dragTargetClientHeight >= dragZoneClientHeight
+
+        if (leftSideRestrict) {
+          cordX = 0
         }
+
+        if (rightSideRestrict) {
+          cordX = dragZoneClientWidth - dragTargetClientWidth
+        }
+
+        if (topSideRestrict) {
+          cordY = 0
+        }
+
+        if (bottomSideRestrict) {
+          cordY = dragZoneClientHeight - dragTargetClientHeight
+        }
+
+        dragTarget.style.left = `${cordX}px`
+        dragTarget.style.top = `${cordY}px`
       }
 
-      setDraggable(true)
+      if (isDragReady) {
+        setDraggable(true)
+      }
+
       moveAt(event.pageX, event.pageY)
 
       const onMouseMove = (event: MouseEvent) => {
@@ -47,12 +73,13 @@ const dragger = () => {
       }
 
       const onMouseUp = () => {
+        isDragReady = false
         document.removeEventListener('mousemove', onMouseMove)
-        dragTarget.removeEventListener('mouseup', onMouseUp)
+        document.removeEventListener('mouseup', onMouseUp)
       }
 
       document.addEventListener('mousemove', onMouseMove)
-      dragTarget.addEventListener('mouseup', onMouseUp)
+      document.addEventListener('mouseup', onMouseUp)
     }
 
     const onResize = () => {

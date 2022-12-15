@@ -15,10 +15,14 @@ const config = {
   devServer: {
     open: true,
     host: 'localhost',
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: 'index.html',
+      template: 'src/index.html',
+      favicon: './src/assets/favicon.ico',
     }),
     new MiniCssExtractPlugin(),
   ],
